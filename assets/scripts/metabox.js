@@ -164,6 +164,8 @@
 
     if (data.task.attachment) {
       attachment.value = data.task.attachment;
+    }else if(config.post_thumbnail.attachment_id){
+      attachment.value = config.post_thumbnail.attachment_id;
     }
 
     poster.appendChild(attachment); // Create hidden input with thumbnail image.
@@ -172,6 +174,12 @@
     thumbnail.setAttribute('type', 'hidden');
     thumbnail.setAttribute('name', meta + '[thumbnail]');
 
+    if (config.post_thumbnail.src) {
+      thumbnail.value = config.post_thumbnail.src;
+
+      image.setAttribute('src', thumbnail.value);
+      poster.appendChild(image);
+    }
     if (data.task.thumbnail) {
       thumbnail.value = data.task.thumbnail; // Create image if thumbnail not empty.
 

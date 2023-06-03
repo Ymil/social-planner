@@ -440,12 +440,15 @@ class Metabox {
 			'meta'      => self::META_TASKS,
 			'action'    => self::AJAX_ACTION,
 			'nonce'     => wp_create_nonce( self::AJAX_ACTION ),
-
 			'tasks'     => self::prepare_tasks( $post_id ),
 			'results'   => self::prepare_results( $post_id ),
 			'offset'    => self::get_time_offset(),
 			'calendar'  => self::get_calendar_days(),
 			'providers' => self::prepare_providers(),
+			'post_thumbnail' => Array(
+				"src" => get_the_post_thumbnail_url($post_id),
+				"attachment_id" => get_post_thumbnail_id($post_id)
+			)			
 		);
 
 		$object['schedules'] = self::get_schedules( $post_id, $object['tasks'] );

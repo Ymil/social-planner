@@ -298,14 +298,11 @@ class Metabox {
 
 			if ( ! empty( $task['date'] ) ) {
 				$sanitized[ $key ]['date'] = sanitize_text_field( $task['date'] );
-
-				if ( isset( $task['hour'] ) ) {
-					$sanitized[ $key ]['hour'] = sanitize_text_field( $task['hour'] );
-				}
-
-				if ( isset( $task['minute'] ) ) {
-					$sanitized[ $key ]['minute'] = sanitize_text_field( $task['minute'] );
-				}
+				
+				if ( isset( $task['datetime'] ) ) {
+					$sanitized[ $key ]['datetime'] = sanitize_text_field( $task['datetime'] );
+				}	
+				
 			}
 
 			if ( ! empty( $task['excerpt'] ) ) {

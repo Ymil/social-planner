@@ -43,8 +43,7 @@ class Scheduler {
 			$planned = self::get_planned_time( $task );
 
 			// Remove all time keys from the task.
-			$task = array_diff_key( $task, array_flip( array( 'date', 'hour', 'minute' ) ) );
-
+			$task = array_diff_key( $task, array_flip( array( ["date", "datetime"] ) ) );
 			if ( empty( $task['targets'] ) ) {
 				self::unschedule_task( $key, $post->ID );
 
@@ -237,6 +236,8 @@ class Scheduler {
 			return new WP_Error( 'config', esc_html__( 'Provider settings not found', 'social-planner' ) );
 		}
 
+		$settings = $providers[ $target ];
+
 		$class = Core::get_network_class( $target );
 
 		if ( ! method_exists( $class, 'send_message' ) ) {
@@ -272,7 +273,7 @@ class Scheduler {
 		 */
 		$message = apply_filters( 'social_planner_prepare_message', $message, $target, $task );
 
-		return $class::send_message( $message, $providers[ $target ] );
+		return $class::send_message( $message, $settings );
 	}
 
 	/**

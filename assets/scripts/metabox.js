@@ -111,63 +111,7 @@
 
     return new Date(timestamp);
   };
-  /**
-   * Parse datetime string.
-   *
-   * @param {HTMLElement} time Time DOM element.
-   * @param {string} index Unique task key.
-   */
 
-
-  var updateTime = function updateTime(time, index) {
-    var date = getServerDate();
-    var clock = {
-      hour: ('0' + date.getHours()).slice(-2),
-      minute: ('0' + date.getMinutes()).slice(-2)
-    };
-    var meta = config.meta + '[' + index + ']'; // Create hour input.
-
-    var hour = document.createElement('input');
-    hour.setAttribute('type', 'text');
-    hour.setAttribute('name', meta + '[hour]');
-    hour.value = clock.hour;
-    time.appendChild(hour);
-    hour.addEventListener('change', function () {
-      if (!hour.value.match(/^\d+$/)) {
-        return hour.value = clock.hour;
-      }
-
-      hour.value = ('0' + parseInt(hour.value)).slice(-2);
-
-      if (hour.value > 23 || hour.value < 0) {
-        return hour.value = clock.hour;
-      }
-
-      clock.hour = hour.value;
-    });
-    var colon = document.createElement('span');
-    colon.textContent = ':';
-    time.appendChild(colon); // Create minute input.
-
-    var minute = document.createElement('input');
-    minute.setAttribute('type', 'text');
-    minute.setAttribute('name', meta + '[minute]');
-    minute.value = clock.minute;
-    time.appendChild(minute);
-    minute.addEventListener('change', function () {
-      if (!minute.value.match(/^\d+$/)) {
-        return minute.value = clock.minute;
-      }
-
-      minute.value = ('0' + minute.value).slice(-2);
-
-      if (minute.value > 59 || minute.value < 0) {
-        return minute.value = clock.minute;
-      }
-
-      clock.minute = minute.value;
-    });
-  };
   /**
    * Helper to create option inside select box
    *
@@ -175,8 +119,6 @@
    * @param {string} content Option text content.
    * @param {string} value Optional option value.
    */
-
-
   var createOption = function createOption(select, content, value) {
     var option = document.createElement('option');
     option.textContent = content;
@@ -479,6 +421,7 @@
       return drawLockedTime(scheduler);
     } // Don't create scheduler for already planned tasks.
 
+    console.table(data);
 
     if (data.schedule) {
       return drawScheduledTime(task, scheduler, index, data);
@@ -494,15 +437,14 @@
     scheduler.appendChild(time); // Create default option.
 
     createOption(date, __('Do not send automatically', 'social-planner')); // Create send immediately option.
-
     createOption(date, __('Publish immediately', 'social-planner'), 'now');
+    createOption(date, __('Custom date', 'social-planner'), 'custom-date');
     config.calendar = config.calendar || {};
 
     for (var name in config.calendar) {
       createOption(date, config.calendar[name], name);
     }
-
-    date.addEventListener('change', function () {
+    date.addEventListener('change', function (e) {
       // Remove time element children.
       while (time.firstChild) {
         time.removeChild(time.lastChild);
@@ -510,7 +452,16 @@
 
 
       if (date.value && date.value !== 'now') {
-        updateTime(time, index);
+        // Create input html type datetime-local and append to time.
+        var input = document.createElement('input');
+        input.setAttribute('type', 'datetime-local');
+        input.setAttribute('name', meta + '[datetime]');
+        input.setAttribute('style', "width: 100%;");
+        if(date.value != "custom-date"){
+          // if select date is not custom-date, set value to date + 00:00:00 in the input
+          input.setAttribute('value', e.currentTarget.value + " 00:00:00");
+        }
+        time.appendChild(input);
       }
     });
   };

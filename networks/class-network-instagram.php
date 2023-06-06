@@ -1,9 +1,9 @@
 <?php
 /**
- * Facebook network handler for Social Planner plugin
+ * Instagram network handler for Social Planner plugin
  *
  * @package social-planner
- * @author  Anton Lukin
+ * @author  Lautaro Linquimán
  */
 
 namespace Social_Planner;
@@ -11,30 +11,30 @@ namespace Social_Planner;
 use WP_Error;
 
 /**
- * Facebook Social Planner class
+ * Instagram Social Planner class
  *
  * @since 1.0.0
  */
-class Network_Facebook extends Network{
+class Network_Instagram extends Network{
 	/**
 	 * Unique network slug.
 	 *
 	 * @var string
 	 */
-	const NETWORK_NAME = 'facebook';
+	const NETWORK_NAME = 'instagram';
 
 	/**
 	 * Settings helper link.
 	 *
 	 * @var string
 	 */
-	const HELPER_LINK = 'https://wpset.org/social-planner/setup/#facebook';
+	const HELPER_LINK = 'https://wpset.org/social-planner/setup/#instagram';
 
 	/**
 	 * Return human-readable network label.
 	 */
 	public static function get_label() {
-		return _x( 'Facebook', 'provider label', 'social-planner' );
+		return _x( 'Instagram', 'provider label', 'social-planner' );
 	}
 
 	/**
@@ -68,14 +68,14 @@ class Network_Facebook extends Network{
 				'required' => true,
 			),
 
-			'group' => array(
-				'label'    => __( 'Community or profile ID', 'social-planner' ),
+			'ig_user_id' => array(
+				'label'    => __( 'User ID', 'social-planner' ),
 				'required' => true,
 			),
 
 			'title' => array(
 				'label' => __( 'Subtitle', 'social-planner' ),
-				'hint'  => __( 'Optional field. Used as an subtitle if there are multiple Facebook providers.', 'social-planner' ),
+				'hint'  => __( 'Optional field. Used as an subtitle if there are multiple Instagram providers.', 'social-planner' ),
 			),
 		);
 
@@ -89,12 +89,12 @@ class Network_Facebook extends Network{
 	 * @param array $settings Settings array from options.
 	 */
 	public static function send_message( $message, $settings ) {
-		if ( empty( $settings['group'] ) ) {
-			return new WP_Error( 'sending', esc_html__( 'Group parameter is not found', 'social-planner' ) );
+		if ( empty( $settings['ig_user_id'] ) ) {
+			return new WP_Error( 'sending', esc_html__( 'User ID parameter is not found', 'social-planner' ) );
 		}
 
 		// Get API URL path using group id from settings.
-		$path = 'https://graph.facebook.com/v9.0/' . $settings['group'];
+		$path = 'https://graph.facebook.com/v17.0/' . $settings['ig_user_id'];
 
 		if ( empty( $settings['token'] ) ) {
 			return new WP_Error( 'sending', esc_html__( 'Token parameter is empty', 'social-planner' ) );
@@ -115,7 +115,7 @@ class Network_Facebook extends Network{
 		$response = json_decode( $response['body'], false );
 
 		if ( ! empty( $response->id ) ) {
-			return 'https://facebook.com/' . $response->id;
+			return 'https://instagram.com/' . $response->id;
 		}
 
 		if ( ! empty( $response->error->message ) ) {
@@ -143,18 +143,21 @@ class Network_Facebook extends Network{
 
 		$excerpt = self::prepare_message_excerpt( $message );
 
-		if ( ! empty( $message['poster'] ) ) {
-			return self::send_poster( $message['poster'], $path . '/photos', $excerpt, $body );
-		}
-
 		if ( empty( $excerpt ) ) {
 			return new WP_Error( 'sending', esc_html__( 'Excerpt and poster are both empty', 'social-planner' ) );
 		}
 
 		$body['message'] = $excerpt;
 
+		$body['caption'] = $excerpt;
+		
+		if ( ! empty( $message['poster'] ) ) {
+			$body['image_url'] = $message['poster'];
+		}
+		$body['image_url'] = get_the_post_thumbnail_url($message["poster_id"]);
+		
 		// Set final URL.
-		$url = $path . '/feed';
+		$url = $path . '/media';
 
 		/**
 		 * Filter request body arguments using message data.
@@ -170,88 +173,7 @@ class Network_Facebook extends Network{
 		$body = apply_filters( 'social_planner_filter_request_body', $body, $message, self::NETWORK_NAME, $url );
 		return;
 		return self::send_request( $url, $body );
-	}
-
-	/**
-	 * Send poster with caption to Facebook.
-	 *
-	 * @param string $poster  Path to local image file.
-	 * @param string $url     Remote API URL.
-	 * @param string $excerpt Prepared caption for poster.
-	 * @param array  $body    Prepared body array.
-	 */
-	private static function send_poster( $poster, $url, $excerpt, $body ) {
-		$boundary = uniqid( 'wp', true );
-
-		if ( ! empty( $excerpt ) ) {
-			$body['caption'] = $excerpt;
-		}
-
-		// Generate multipart data body.
-		$body = self::prepare_multipart_data( $body, array( 'source' => $poster ), $boundary );
-
-		if ( is_wp_error( $body ) ) {
-			return $body;
-		}
-
-		$headers = array(
-			'Content-Type'   => 'multipart/form-data; boundary=' . $boundary,
-			'Content-Length' => strlen( $body ),
-		);
-
-		/**
-		 * Filter request body arguments using message data.
-		 *
-		 * @param string $body    Request body arguments.
-		 * @param array  $message Message data.
-		 * @param string $network Network name.
-		 * @param string $url     Remote API URL.
-		 *
-		 * @since 1.3.0
-		 */
-		$body = apply_filters( 'social_planner_filter_request_body', $body, $message, self::NETWORK_NAME, $url );
-
-		return self::send_request( $url, $body, $headers );
-	}
-
-	/**
-	 * Create multipart data.
-	 *
-	 * @param array  $data     List of default query params.
-	 * @param array  $files    List of files.
-	 * @param string $boundary Boundary delimiter.
-	 */
-	private static function prepare_multipart_data( $data, $files, $boundary ) {
-		$body = array();
-
-		foreach ( $data as $key => $value ) {
-			$body[] = "--$boundary";
-			$body[] = "Content-Disposition: form-data; name=\"$key\"";
-			$body[] = "\r\n" . $value;
-		}
-
-		foreach ( $files as $name => $filename ) {
-			$file = basename( $filename );
-			$type = wp_check_filetype( $filename )['type'];
-
-			// phpcs:ignore WordPress.WP.AlternativeFunctions
-			$content = file_get_contents( $filename );
-
-			if ( false === $content ) {
-				return new WP_Error( 'sending', esc_html__( 'Cannot read poster file' ) );
-			}
-
-			$body[] = "--$boundary";
-			$body[] = "Content-Disposition: form-data; name=\"$name\"; filename=\"$file\"";
-			$body[] = "Content-Type: $type";
-			$body[] = "\r\n" . $content;
-		}
-
-		// Add final boundary.
-		$body[] = "--$boundary--\r\n";
-
-		return implode( "\r\n", $body );
-	}
+	}	
 
 	/**
 	 * Send request to remote server.

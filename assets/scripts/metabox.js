@@ -9,7 +9,7 @@
   if ('undefined' === typeof wp) {
     return;
   }
-
+  var $ = jQuery;
   var __ = wp.i18n.__;
   var metabox = document.querySelector('#social-planner-metabox > .inside'); // Stop if settings element not exists.
 
@@ -350,9 +350,7 @@
     var list = task.parentNode;
     list.removeChild(task); // Append at least one task.
 
-    if (!list.hasChildNodes()) {
-      createEmptyTask(list);
-    }
+
   };
   /**
    * Cancel the task.
@@ -444,7 +442,7 @@
     time.classList.add('social-planner-time');
     scheduler.appendChild(time); // Create default option.
 
-    createOption(date, __('Do not send automatically', 'social-planner')); // Create send immediately option.
+    createOption(date, __('Do not send automatically', 'social-planner'), "do-not-send"); // Create send immediately option.
     createOption(date, __('Publish immediately', 'social-planner'), 'now');
     createOption(date, __('Custom date', 'social-planner'), 'custom-date');
     config.calendar = config.calendar || {};
@@ -884,10 +882,6 @@
     } // Append at least one task.
 
 
-    if (!list.hasChildNodes()) {
-      createEmptyTask(list);
-    }
-
     return list;
   };
   /**
@@ -916,7 +910,7 @@
       var isSavingPost = wp.data.select('core/edit-post').isSavingMetaBoxes();
 
       if (wasSavingPost && !isSavingPost) {
-        reinitMetabox();
+        saveMetaBox();
       }
 
       wasSavingPost = isSavingPost;
@@ -926,6 +920,24 @@
    * Init metabox.
    */
 
+  var saveMetaBox = async function saveMetaBox() {
+    var postID = document.getElementById('post_ID');
+    const data = $($("#social-planner-metabox").parents("form")[0]).serialize() + '&action='+config.action+'&nonce='+config.nonce+'&post='+postID.value+'&handler=save';
+    const result = await $.ajax({
+      url: ajaxurl,
+      type: 'POST',
+      data: data,
+    }).success(function (response) {
+      if(response.success){
+        reinitMetabox();
+      }else{
+        alert("Social Planner Error: " + response.data.message)
+      }
+    }).error(function (error) {
+      alert("Social Planner Error: " + error.responseText)
+    });
+    return result;
+  };
 
   var initMetabox = function initMetabox() {
     if (!config.meta) {

@@ -28,7 +28,7 @@ class Core {
 	 */
 	public static function add_hooks() {
 		add_action( 'init', array( __CLASS__, 'init_networks' ) );
-
+		add_action( 'plugins_loaded', array( __CLASS__ , 'i18n' ));
 		// Init settings class.
 		Settings::add_hooks();
 
@@ -46,12 +46,14 @@ class Core {
 	 * Parse list of networks with its name as key and class as value.
 	 */
 	public static function init_networks() {
+		include SOCIAL_PLANNER_DIR . '/networks/class-network.php';
 		$networks = array(
 			'Social_Planner\Network_Telegram'   => SOCIAL_PLANNER_DIR . '/networks/class-network-telegram.php',
 			'Social_Planner\Network_Twitter'    => SOCIAL_PLANNER_DIR . '/networks/class-network-twitter.php',
 			'Social_Planner\Network_Twitter_V2' => SOCIAL_PLANNER_DIR . '/networks/class-network-twitter-v2.php',
 			'Social_Planner\Network_VK'         => SOCIAL_PLANNER_DIR . '/networks/class-network-vk.php',
 			'Social_Planner\Network_Facebook'   => SOCIAL_PLANNER_DIR . '/networks/class-network-facebook.php',
+			'Social_Planner\Network_Instagram'   => SOCIAL_PLANNER_DIR . '/networks/class-network-instagram.php',
 			'Social_Planner\Network_OK'         => SOCIAL_PLANNER_DIR . '/networks/class-network-ok.php',
 			'Social_Planner\Network_Linkedin'   => SOCIAL_PLANNER_DIR . '/networks/class-network-linkedin.php',
 		);
@@ -77,6 +79,12 @@ class Core {
 				self::$networks[ $plugin_class::NETWORK_NAME ] = $plugin_class;
 			}
 		}
+		add_filter("social_planner_prepare_excerpt", array(__CLASS__, "prepare_excerpt"), 10, 2);
+	}
+
+
+	public static function prepare_excerpt($excerpt, $post_id) {
+		return $excerpt;
 	}
 
 	/**
@@ -143,5 +151,14 @@ class Core {
 		 * @param string $format Datetime format.
 		 */
 		return apply_filters( 'social_planner_time_format', $format );
+	}
+
+
+	/**
+	 * Loads the translation files.
+	 */
+	public static function i18n() {
+		load_plugin_textdomain( 'social-planner', false, trailingslashit( dirname( plugin_basename( SOCIAL_PLANNER_FILE ) ) ) . 'languages' );
+
 	}
 }

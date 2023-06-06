@@ -52,7 +52,7 @@ class Metabox {
 	 */
 	public static function add_hooks() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_metabox' ) );
-		add_action( 'save_post', array( __CLASS__, 'save_metabox' ), 10, 2 );
+		// add_action( 'save_post', array( __CLASS__, 'save_metabox' ), 10, 2 );
 
 		// Metabox AJAX actions.
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, array( __CLASS__, 'process_ajax' ) );
@@ -100,6 +100,8 @@ class Metabox {
 			esc_html__( 'This metabox requires JavaScript. Enable it in your browser settings, please.', 'social-planner' )
 		);
 
+		
+
 		wp_nonce_field( 'metabox', self::METABOX_NONCE );
 	}
 
@@ -115,6 +117,7 @@ class Metabox {
 		}
 
 		if ( wp_is_post_revision( $post_id ) ) {
+			wp_send_json_error(Array("message"=>"Wordpress post is in revision mode"));
 			return;
 		}
 
@@ -126,9 +129,9 @@ class Metabox {
 			return;
 		}
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return;
-		}
+		// if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		// 	return;
+		// }
 
 		if ( ! isset( $_POST[ self::META_TASKS ] ) ) {
 			return;
@@ -141,12 +144,18 @@ class Metabox {
 		$tasks = self::sanitize_tasks( $tasks );
 
 		// Try to schedule something.
-		$tasks = Scheduler::schedule_tasks( $tasks, $post );
-
+		try {
+			$tasks = Scheduler::schedule_tasks( $tasks, $post );
+		} catch (\Throwable $th) {
+			wp_send_json_error(Array("message"=>$th->getMessage()));
+		}
+		
 		self::update_tasks( $post_id, $tasks );
 
 		// Remove from meta results deleted tasks.
 		self::sync_results( $post_id, $tasks );
+
+		wp_send_json_success(Array("message"=>"Tasks saved successfully"));
 	}
 
 	/**
@@ -228,6 +237,12 @@ class Metabox {
 		if ( 'update' === $_POST['handler'] ) {
 			self::ajax_update_script( $_POST );
 		}
+
+		if ( 'save' === $_POST['handler'] ) {
+			$post_id = $_POST['post'];
+			self::save_metabox($post_id, get_post($post_id));
+			// self::ajax_update_script( $_POST );
+		}
 	}
 
 	/**
@@ -285,7 +300,7 @@ class Metabox {
 
 		foreach ( $tasks as $key => $task ) {
 			$key = sanitize_key( $key );
-
+			// var_dump($task);
 			if ( ! empty( $task['targets'] ) ) {
 				foreach ( (array) $task['targets'] as $target ) {
 					if ( ! array_key_exists( $target, $providers ) ) {
@@ -473,6 +488,7 @@ class Metabox {
 		$tasks = self::get_tasks( $post_id );
 
 		foreach ( $tasks as $key => $task ) {
+			
 			if ( ! empty( $task['thumbnail'] ) ) {
 				$tasks[ $key ]['thumbnail'] = esc_url( $task['thumbnail'] );
 			}

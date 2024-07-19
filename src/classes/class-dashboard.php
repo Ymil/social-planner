@@ -153,11 +153,15 @@ class Dashboard {
 			// Get all tasks for certain post id to find scheduled task data.
 			$data = Metabox::get_tasks( $task['post_id'] );
 
-			if ( empty( $data[ $key ] ) ) {
-				continue;
+			if( is_array($data)){
+
+				if ( empty( $data[ $key ] ) ) {
+					continue;
+				}
+
+				$prepared[] = self::compose_task( $task, $data[ $key ] );
 			}
 
-			$prepared[] = self::compose_task( $task, $data[ $key ] );
 		}
 
 		return $prepared;

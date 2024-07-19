@@ -48,6 +48,7 @@ class Core {
 	public static function init_networks() {
 		include SOCIAL_PLANNER_DIR . '/networks/class-network.php';
 		$networks = array(
+			'Social_Planner\Network_Make'   => SOCIAL_PLANNER_DIR . '/networks/class-network-make.php',
 			'Social_Planner\Network_Telegram'   => SOCIAL_PLANNER_DIR . '/networks/class-network-telegram.php',
 			'Social_Planner\Network_Twitter'    => SOCIAL_PLANNER_DIR . '/networks/class-network-twitter.php',
 			'Social_Planner\Network_Twitter_V2' => SOCIAL_PLANNER_DIR . '/networks/class-network-twitter-v2.php',

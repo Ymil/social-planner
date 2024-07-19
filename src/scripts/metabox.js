@@ -11,7 +11,7 @@
 	const { __ } = wp.i18n;
 
 	const metabox = document.querySelector( '#social-planner-metabox > .inside' );
-
+	const $ = jQuery;
 	// Stop if settings element not exists.
 	if ( null === metabox ) {
 		return;
@@ -243,6 +243,13 @@
 		const thumbnail = document.createElement( 'input' );
 		thumbnail.setAttribute( 'type', 'hidden' );
 		thumbnail.setAttribute( 'name', meta + '[thumbnail]' );
+
+		if (config.post_thumbnail.src) {
+			thumbnail.value = config.post_thumbnail.src;
+	  
+			image.setAttribute('src', thumbnail.value);
+			poster.appendChild(image);
+		  }
 
 		if ( data.task.thumbnail ) {
 			thumbnail.value = data.task.thumbnail;
@@ -540,6 +547,7 @@
 
 		// Create send immediately option.
 		createOption( date, __( 'Publish immediately', 'social-planner' ), 'now' );
+		createOption(date, __('Custom date', 'social-planner'), 'custom-date');
 
 		config.calendar = config.calendar || {};
 
@@ -554,9 +562,18 @@
 			}
 
 			// Show time only if the date.
-			if ( date.value && date.value !== 'now' ) {
-				updateTime( time, index );
-			}
+			if (date.value && date.value !== 'now') {
+        // Create input html type datetime-local and append to time.
+        var input = document.createElement('input');
+        input.setAttribute('type', 'datetime-local');
+        input.setAttribute('name', meta + '[datetime]');
+        input.setAttribute('style', "width: 100%;");
+        if(date.value != "custom-date"){
+          // if select date is not custom-date, set value to date + 00:00:00 in the input
+          input.setAttribute('value', e.currentTarget.value + " 00:00:00");
+        }
+        time.appendChild(input);
+      }
 		} );
 	};
 
@@ -1039,12 +1056,31 @@
 			const isSavingPost = wp.data.select( 'core/edit-post' ).isSavingMetaBoxes();
 
 			if ( wasSavingPost && ! isSavingPost ) {
-				reinitMetabox();
+				saveMetaBox();
 			}
 
 			wasSavingPost = isSavingPost;
 		} );
 	};
+
+
+	const saveMetaBox = () => {
+		var postID = document.getElementById('post_ID');
+		const data = $($("#social-planner-metabox").parents("form")[0]).serialize() + '&action='+config.action+'&nonce='+config.nonce+'&post='+postID.value+'&handler=save';
+		$.ajax({
+		  url: ajaxurl,
+		  type: 'POST',
+		  data: data,
+		}).success(function (response) {
+		  if(response.success){
+			reinitMetabox();
+		  }else{
+			alert("Social Planner Error: " + response.data.message)
+		  }
+		}).error(function (error) {
+		  alert("Social Planner Error: " + error.responseText)
+		});
+	  };
 
 	/**
 	 * Init metabox.

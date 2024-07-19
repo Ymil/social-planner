@@ -52,7 +52,6 @@ class Metabox {
 	 */
 	public static function add_hooks() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_metabox' ) );
-		// add_action( 'save_post', array( __CLASS__, 'save_metabox' ), 10, 2 );
 
 		// Metabox AJAX actions.
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, array( __CLASS__, 'process_ajax' ) );
@@ -128,10 +127,6 @@ class Metabox {
 		if ( ! wp_verify_nonce( sanitize_key( $_POST[ self::METABOX_NONCE ] ), 'metabox' ) ) {
 			return;
 		}
-
-		// if ( ! current_user_can( 'edit_post', $post_id ) ) {
-		// 	return;
-		// }
 
 		if ( ! isset( $_POST[ self::META_TASKS ] ) ) {
 			return;
@@ -300,7 +295,6 @@ class Metabox {
 
 		foreach ( $tasks as $key => $task ) {
 			$key = sanitize_key( $key );
-			// var_dump($task);
 			if ( ! empty( $task['targets'] ) ) {
 				foreach ( (array) $task['targets'] as $target ) {
 					if ( ! array_key_exists( $target, $providers ) ) {

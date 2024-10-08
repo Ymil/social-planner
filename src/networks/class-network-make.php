@@ -136,7 +136,10 @@ class Network_Make {
 		}
 
 		if ( ! empty( $message['poster_id'] ) ) {
-			$body['image_url'] = wp_get_attachment_url( $message['poster_id'] );
+
+			$url_image = wp_get_attachment_url( $message['poster_id'] );
+			$url_image_encode = urlencode($url_image);
+			$body['image_url'] = $url_image_encode;
 		}
 
 		$body['content'] = $excerpt;

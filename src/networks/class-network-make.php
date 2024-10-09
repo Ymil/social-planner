@@ -119,6 +119,7 @@ class Network_Make {
 		return apply_filters( 'social_planner_prepare_excerpt', $excerpt, $message, self::NETWORK_NAME );
 	}
 
+
 	/**
 	 * Prepare data and send request to remote API.
 	 *
@@ -132,13 +133,15 @@ class Network_Make {
 		$excerpt = self::prepare_message_excerpt( $message );
 
 		if ( empty( $excerpt ) || empty( $message['poster_id'] ) ) {
-			return new WP_Error( 'sending', esc_html__( 'Excerpt or poster both empty', 'social-planner' ) );
+			throw new WP_Error( 'Excerpt or poster are empty' );
 		}
 		
 		$url_image = wp_get_attachment_url( $message['poster_id'] );
-		$parsed_url = parse_url($url_image);
-		$url_image_encode = $parsed_url['scheme'] . '://' . $parsed_url['host'] . rawurlencode($parsed_url['path']);
-		$body['image_url'] = $url_image_encode;
+		if(empty($url_image)){
+			throw new WP_Error( 'Poster image not found' );
+		}
+
+		$body['image_url'] = $url_image;
 		$body['content'] = $excerpt;
 
 		/**

@@ -115,70 +115,7 @@
 		// Get date using server timestamp.
 		return new Date( timestamp );
 	};
-
-	/**
-	 * Parse datetime string.
-	 *
-	 * @param {HTMLElement} time Time DOM element.
-	 * @param {string} index Unique task key.
-	 */
-	const updateTime = ( time, index ) => {
-		const date = getServerDate();
-
-		const clock = {
-			hour: ( '0' + date.getHours() ).slice( -2 ),
-			minute: ( '0' + date.getMinutes() ).slice( -2 ),
-		};
-
-		const meta = config.meta + '[' + index + ']';
-
-		// Create hour input.
-		const hour = document.createElement( 'input' );
-		hour.setAttribute( 'type', 'text' );
-		hour.setAttribute( 'name', meta + '[hour]' );
-		hour.value = clock.hour;
-		time.appendChild( hour );
-
-		hour.addEventListener( 'change', () => {
-			if ( ! hour.value.match( /^\d+$/ ) ) {
-				return ( hour.value = clock.hour );
-			}
-
-			hour.value = ( '0' + parseInt( hour.value ) ).slice( -2 );
-
-			if ( hour.value > 23 || hour.value < 0 ) {
-				return ( hour.value = clock.hour );
-			}
-
-			clock.hour = hour.value;
-		} );
-
-		const colon = document.createElement( 'span' );
-		colon.textContent = ':';
-		time.appendChild( colon );
-
-		// Create minute input.
-		const minute = document.createElement( 'input' );
-		minute.setAttribute( 'type', 'text' );
-		minute.setAttribute( 'name', meta + '[minute]' );
-		minute.value = clock.minute;
-		time.appendChild( minute );
-
-		minute.addEventListener( 'change', () => {
-			if ( ! minute.value.match( /^\d+$/ ) ) {
-				return ( minute.value = clock.minute );
-			}
-
-			minute.value = ( '0' + minute.value ).slice( -2 );
-
-			if ( minute.value > 59 || minute.value < 0 ) {
-				return ( minute.value = clock.minute );
-			}
-
-			clock.minute = minute.value;
-		} );
-	};
-
+	
 	/**
 	 * Helper to create option inside select box
 	 *

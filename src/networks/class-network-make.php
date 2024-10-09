@@ -136,7 +136,8 @@ class Network_Make {
 		}
 		
 		$url_image = wp_get_attachment_url( $message['poster_id'] );
-		$url_image_encode = urlencode($url_image);
+		$parsed_url = parse_url($url_image);
+		$url_image_encode = $parsed_url['scheme'] . '://' . $parsed_url['host'] . rawurlencode($parsed_url['path']);
 		$body['image_url'] = $url_image_encode;
 		$body['content'] = $excerpt;
 

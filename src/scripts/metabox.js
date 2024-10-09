@@ -173,14 +173,20 @@
 		
 		poster.appendChild( attachment );
 		
+		// Create hidden input with thumbnail image.
+		const thumbnail = document.createElement( 'input' );
+		thumbnail.setAttribute( 'type', 'hidden' );
+		thumbnail.setAttribute( 'name', meta + '[thumbnail]' );
 		if ( data.task.thumbnail ) {
 			thumbnail.value = data.task.thumbnail;
 		}else if (config.post_thumbnail.src) {
 			thumbnail.value = config.post_thumbnail.src;
 		}
+		poster.appendChild( thumbnail );
 		
 		image.setAttribute('src', thumbnail.value);
 		poster.appendChild(image);
+		
 		
 		if ( data.task.attachment ) {
 			attachment.value = data.task.attachment;
@@ -188,12 +194,6 @@
 			// If no exist attachment id use post thumbnail
 			attachment.value = config.post_thumbnail.attachment_id;
 		}
-		// Create hidden input with thumbnail image.
-		const thumbnail = document.createElement( 'input' );
-		thumbnail.setAttribute( 'type', 'hidden' );
-		thumbnail.setAttribute( 'name', meta + '[thumbnail]' );
-		poster.appendChild( thumbnail );
-
 		// Choose button listener.
 		choose.addEventListener( 'click', () => {
 			const frame = wp.media( {
@@ -371,10 +371,6 @@
 		const list = task.parentNode;
 		list.removeChild( task );
 
-		// Append at least one task.
-		if ( ! list.hasChildNodes() ) {
-			createEmptyTask( list );
-		}
 	};
 
 	/**
@@ -953,11 +949,6 @@
 
 		for ( const index in config.tasks ) {
 			list.appendChild( createTask( index ) );
-		}
-
-		// Append at least one task.
-		if ( ! list.hasChildNodes() ) {
-			createEmptyTask( list );
 		}
 
 		return list;

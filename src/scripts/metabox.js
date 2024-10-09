@@ -115,7 +115,7 @@
 		// Get date using server timestamp.
 		return new Date( timestamp );
 	};
-	
+
 	/**
 	 * Helper to create option inside select box
 	 *
@@ -476,7 +476,7 @@
 		scheduler.appendChild( time );
 
 		// Create default option.
-		createOption( date, __( 'Do not send automatically', 'social-planner' ) );
+		createOption( date, __( 'Do not send automatically', 'social-planner' ),  "do-not-send" );
 
 		// Create send immediately option.
 		createOption( date, __( 'Publish immediately', 'social-planner' ), 'now' );
@@ -488,7 +488,7 @@
 			createOption( date, config.calendar[ name ], name );
 		}
 
-		date.addEventListener( 'change', () => {
+		date.addEventListener( 'change', (e) => {
 			// Remove time element children.
 			while ( time.firstChild ) {
 				time.removeChild( time.lastChild );
@@ -496,17 +496,17 @@
 
 			// Show time only if the date.
 			if (date.value && date.value !== 'now') {
-        // Create input html type datetime-local and append to time.
-        var input = document.createElement('input');
-        input.setAttribute('type', 'datetime-local');
-        input.setAttribute('name', meta + '[datetime]');
-        input.setAttribute('style', "width: 100%;");
-        if(date.value != "custom-date"){
-          // if select date is not custom-date, set value to date + 00:00:00 in the input
-          input.setAttribute('value', e.currentTarget.value + " 00:00:00");
-        }
-        time.appendChild(input);
-      }
+				// Create input html type datetime-local and append to time.
+				var input = document.createElement('input');
+				input.setAttribute('type', 'datetime-local');
+				input.setAttribute('name', meta + '[datetime]');
+				input.setAttribute('style', "width: 100%;");
+				if (date.value != "custom-date"){
+					// if select date is not custom-date, set value to date + 00:00:00 in the input
+					input.setAttribute('value', e.currentTarget.value + " 00:00:00");
+				}
+				time.appendChild(input);
+			}
 		} );
 	};
 

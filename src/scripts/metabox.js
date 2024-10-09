@@ -233,32 +233,28 @@
 		attachment.setAttribute( 'type', 'hidden' );
 		attachment.setAttribute( 'name', meta + '[attachment]' );
 
+		
+		poster.appendChild( attachment );
+		
+		if ( data.task.thumbnail ) {
+			thumbnail.value = data.task.thumbnail;
+		}else if (config.post_thumbnail.src) {
+			thumbnail.value = config.post_thumbnail.src;
+		}
+		
+		image.setAttribute('src', thumbnail.value);
+		poster.appendChild(image);
+		
 		if ( data.task.attachment ) {
 			attachment.value = data.task.attachment;
+		}else if(config.post_thumbnail.attachment_id){
+			// If no exist attachment id use post thumbnail
+			attachment.value = config.post_thumbnail.attachment_id;
 		}
-
-		poster.appendChild( attachment );
-
 		// Create hidden input with thumbnail image.
 		const thumbnail = document.createElement( 'input' );
 		thumbnail.setAttribute( 'type', 'hidden' );
 		thumbnail.setAttribute( 'name', meta + '[thumbnail]' );
-
-		if (config.post_thumbnail.src) {
-			thumbnail.value = config.post_thumbnail.src;
-	  
-			image.setAttribute('src', thumbnail.value);
-			poster.appendChild(image);
-		  }
-
-		if ( data.task.thumbnail ) {
-			thumbnail.value = data.task.thumbnail;
-
-			// Create image if thumbnail not empty.
-			image.setAttribute( 'src', data.task.thumbnail );
-			poster.appendChild( image );
-		}
-
 		poster.appendChild( thumbnail );
 
 		// Choose button listener.

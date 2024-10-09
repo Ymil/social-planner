@@ -131,17 +131,13 @@ class Network_Make {
 		$url     = $webhook_url;
 		$excerpt = self::prepare_message_excerpt( $message );
 
-		if ( empty( $excerpt ) && empty( $message['poster_id'] ) ) {
-			return new WP_Error( 'sending', esc_html__( 'Excerpt and poster are both empty', 'social-planner' ) );
+		if ( empty( $excerpt ) || empty( $message['poster_id'] ) ) {
+			return new WP_Error( 'sending', esc_html__( 'Excerpt or poster both empty', 'social-planner' ) );
 		}
-
-		if ( ! empty( $message['poster_id'] ) ) {
-
-			$url_image = wp_get_attachment_url( $message['poster_id'] );
-			$url_image_encode = urlencode($url_image);
-			$body['image_url'] = $url_image_encode;
-		}
-
+		
+		$url_image = wp_get_attachment_url( $message['poster_id'] );
+		$url_image_encode = urlencode($url_image);
+		$body['image_url'] = $url_image_encode;
 		$body['content'] = $excerpt;
 
 		/**

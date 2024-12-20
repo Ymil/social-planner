@@ -206,13 +206,7 @@
 
 				let url = selection.url;
 
-				// Set attachment id value.
 				attachment.value = selection.id;
-
-				// Set thumbnail as selection if exists
-				if ( 'undefined' !== typeof selection.sizes.thumbnail ) {
-					url = selection.sizes.thumbnail.url;
-				}
 
 				thumbnail.value = url;
 				image.setAttribute( 'src', url );

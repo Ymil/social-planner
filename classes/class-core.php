@@ -57,6 +57,7 @@ class Core {
 			'Social_Planner\Network_Instagram'   => SOCIAL_PLANNER_DIR . '/networks/class-network-instagram.php',
 			'Social_Planner\Network_OK'         => SOCIAL_PLANNER_DIR . '/networks/class-network-ok.php',
 			'Social_Planner\Network_Linkedin'   => SOCIAL_PLANNER_DIR . '/networks/class-network-linkedin.php',
+			'Social_Planner\Network_Make'       => SOCIAL_PLANNER_DIR . '/networks/class-network-make.php',
 		);
 
 		/**

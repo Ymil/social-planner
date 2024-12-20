@@ -15,7 +15,7 @@ use WP_Error;
  *
  * @since 1.0.0
  */
-class Network_Facebook extends Network{
+class Network_Facebook {
 	/**
 	 * Unique network slug.
 	 *
@@ -100,8 +100,6 @@ class Network_Facebook extends Network{
 			return new WP_Error( 'sending', esc_html__( 'Token parameter is empty', 'social-planner' ) );
 		}
 
-		// return new WP_Error("sending", message);
-
 		$response = self::make_request( $message, $path, $settings['token'] );
 
 		if ( is_wp_error( $response ) ) {
@@ -132,7 +130,7 @@ class Network_Facebook extends Network{
 	 * @param string $path    Remote API URL path.
 	 * @param string $token   Access token from settings.
 	 */
-	protected static function make_request( $message, $path, $token ) {
+	private static function make_request( $message, $path, $token ) {
 		$body = array(
 			'access_token' => $token,
 		);
@@ -168,7 +166,7 @@ class Network_Facebook extends Network{
 		 * @version 1.3.0
 		 */
 		$body = apply_filters( 'social_planner_filter_request_body', $body, $message, self::NETWORK_NAME, $url );
-		return;
+
 		return self::send_request( $url, $body );
 	}
 
@@ -251,6 +249,34 @@ class Network_Facebook extends Network{
 		$body[] = "--$boundary--\r\n";
 
 		return implode( "\r\n", $body );
+	}
+
+	/**
+	 * Prepare message excerpt.
+	 *
+	 * @param array $message List of message args.
+	 */
+	private static function prepare_message_excerpt( $message ) {
+		$excerpt = array();
+
+		if ( ! empty( $message['excerpt'] ) ) {
+			$excerpt[] = $message['excerpt'];
+		}
+
+		if ( ! empty( $message['link'] ) ) {
+			$excerpt[] = $message['link'];
+		}
+
+		$excerpt = implode( "\n\n", $excerpt );
+
+		/**
+		 * Filter message excerpt right before sending.
+		 *
+		 * @param string $excerpt Message excerpt.
+		 * @param array  $message Original message array.
+		 * @param string $network Network name.
+		 */
+		return apply_filters( 'social_planner_prepare_excerpt', $excerpt, $message, self::NETWORK_NAME );
 	}
 
 	/**

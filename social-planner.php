@@ -7,7 +7,7 @@
  * Author URI: https://wpset.org
  * Requires at least: 5.3
  * Tested up to: 6.5.5
- * Version: 1.4.0
+ * Version: 1.4.0-ymil1
  *
  * Text Domain: social-planner
  *
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin version.
  */
-define( 'SOCIAL_PLANNER_VERSION', '1.4.0' );
+define( 'SOCIAL_PLANNER_VERSION', '1.4.0-ymil1' );
 
 /**
  * Plugin admin menu slug.

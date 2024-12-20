@@ -1,10 +1,10 @@
 === Social Planner ===
 Contributors: antonlukin
 Donate link: https://wpset.org/about/
-Tags: automation, autopost, auto-post, auto post, socialnetworks, socialnetwork, social networks, social network, facebook, twitter, telegram, vkontakte, vk.com, ok.ru, api, social images, social image, sharing, share, repost, re-post, open graph
+Tags: auto post, social networks, facebook, twitter, linkedin
 Requires at least: 5.3
-Tested up to: 6.2
-Stable tag: 1.3.0
+Tested up to: 6.5.5
+Stable tag: 1.4.0
 Requires PHP: 5.6
 License: GPLv2 or later
 
@@ -36,6 +36,7 @@ Please see detailed [installation instructions](https://wpset.org/social-planner
 * **Telegram** — Autopost to the channel, group or chat using Telegram bot.
 * **VK.com** — Autopost to your profile or group page with ability to make **Image** posts.
 * **OK.ru** — Autopost to your groups with ability to make **Image** posts.
+* **Linkedin.com** — Autopost to your profile or group with ability to attach image.
 
 == Get support ==
 First of all read the [Frequently asked Questions](https://wpset.org/social-planner/#faq) on the plugin documentation page.
@@ -49,6 +50,12 @@ If you find a bug or want to add new feature to this plugin, create new [issue](
 4. Settings Page
 
 == Changelog ==
+
+= 1.4.0 =
+* Adding new provider for make.com.
+
+= 1.3.2 =
+* Bump 'Tested up' version and update readme
 
 = 1.3.0 =
 * Adding new provider for Linkedin.
